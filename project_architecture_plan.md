@@ -292,7 +292,8 @@ CREATE TABLE templates (
 -- Action Definitions (linked to component custom_ids)
 CREATE TABLE action_definitions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    template_id INTEGER NOT NULL REFERENCES templates(id) ON DELETE CASCADE,
+    template_id INTEGER REFERENCES templates(id) ON DELETE CASCADE,
+    message_id TEXT,                      -- Ad-hoc message ID; null for template-owned flows
     custom_id TEXT NOT NULL,              -- e.g., "action:add_role:123456789"
     action_type TEXT NOT NULL,            -- add_role, remove_role, toggle_role, send_dm, etc.
     config TEXT NOT NULL,                 -- JSON: action-specific parameters
@@ -330,6 +331,7 @@ CREATE TABLE scheduled_messages (
 CREATE INDEX idx_templates_user ON templates(user_id);
 CREATE INDEX idx_actions_template ON action_definitions(template_id);
 CREATE INDEX idx_actions_custom_id ON action_definitions(custom_id);
+CREATE INDEX idx_actions_message_custom ON action_definitions(message_id, custom_id);
 CREATE INDEX idx_logs_interaction ON action_logs(interaction_id);
 CREATE INDEX idx_scheduled_next_run ON scheduled_messages(next_run_at);
 ```

@@ -15,13 +15,12 @@ NOTE
 
 Do you want the multi-step action flows to support conditional branching (e.g. "if user has role X, do Y, else do Z"), or just linear sequences (e.g. "step 1, step 2, step 3") for now?
 
-**Resolved: linear multi-step, plus the Discohook step set.** The Flow tab builds an
+**Resolved: multi-step flows with nested conditional branches.** The Flow tab builds an
 ordered chain (`add_role`, `remove_role`, `toggle_role`, `send_dm`,
 `send_ephemeral_reply`, `send_message`, `send_webhook_message`, `open_modal`,
 `delete_message`, `create_thread`, `wait`, `set_variable`, `check`). Steps run top to
-bottom and stop at the first visible reply. `check` still evaluates conditions
-server-side, so conditional branching can be surfaced in the builder later without a
-backend change.
+bottom and stop at the first visible reply. `check` evaluates conditions server-side
+and supports nested **Then** and **Else** step lists in the builder.
 
 Proposed Changes
 Backend & Component V2 Fixes

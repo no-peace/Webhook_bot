@@ -169,8 +169,9 @@ tab picker is built from. (If you see fewer, the server build is stale: `npm run
    | **set variable** | Stores a value for later steps. *Static* is a literal; *From the interaction* reads a field like `user.id` or the picked select values; *Copy another variable* mirrors an existing one |
    | **stop** | Ends the flow here — useful at the end of a branch so it does not fall through into the steps after the check |
 
-   Reference a variable anywhere a text field appears with `{{name}}`, and inside a check with
-   `{{user.id}}` style dotted paths. **Multi-step and branching flows run on the server**, so send
+   Reference variables in action-flow text fields with `{name}` or `{{name}}`, and inside a check
+   with `{user.id}` style dotted paths. They resolve when the interaction runs, not in the initial
+   message. **Multi-step and branching flows run on the server**, so send
    in bot-token mode (or from a saved template) for them to work — see the note at the end of
    section 6.
 6. Everything you build is saved in your browser automatically (localStorage), so a refresh
