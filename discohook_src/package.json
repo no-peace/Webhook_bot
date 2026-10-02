@@ -1,0 +1,29 @@
+{
+  "name": "discohook",
+  "version": "1.0.0",
+  "description": "Monorepo for Discohook",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev:bot": "cd packages/bot && npm run dev",
+    "bot-ws": "cd packages/bot-ws && npm run bot",
+    "dev:site": "cd packages/site && npm run dev",
+    "dev:backups": "cd packages/magic-backup-importer && npm run dev",
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "fix": "biome check --write .",
+    "db-generate": "drizzle-kit generate",
+    "db-migrate": "drizzle-kit migrate",
+    "db-push": "drizzle-kit push",
+    "db-studio": "drizzle-kit studio",
+    "refresh-store": "cd packages/bot && yarn && cd ../site && yarn && cd ../bot-rw && yarn"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6",
+    "drizzle-kit": "^0.31.8"
+  },
+  "packageManager": "yarn@4.1.0"
+}

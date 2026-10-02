@@ -1,0 +1,20 @@
+import type { APIGuild, GuildPremiumTier } from "discord-api-types/v10";
+
+export type PartialKVGuild = Pick<APIGuild, "id" | "name" | "icon">;
+
+export type TriggerKVGuild = PartialKVGuild & {
+  owner_id: string;
+  members: number;
+  online_members: number;
+  roles: number;
+  boosts: number;
+  boost_level: GuildPremiumTier;
+  vanity_code: string | null;
+  emoji_limit?: number;
+  sticker_limit?: number;
+  _roles?: {
+    id: string;
+    position: number;
+    permissions: string;
+  }[];
+};

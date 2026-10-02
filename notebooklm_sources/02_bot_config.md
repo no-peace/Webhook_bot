@@ -1,0 +1,65 @@
+# 02 bot config
+
+package.json
+bot/package.json
+```json
+{
+  "name": "bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Sapphire gateway worker — slash commands and gateway events, driving the same API the web editor uses.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@dmb/shared": "*",
+    "@sapphire/framework": "^5.5.1",
+    "discord.js": "^14.27.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+```
+
+
+tsconfig.json
+bot/tsconfig.json
+```json
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "newLine": "lf"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}
+```
+
+
+tsconfig.build.json
+bot/tsconfig.build.json
+```json
+{
+  "extends": "./tsconfig.json",
+  "//": "Build-only config: identical to tsconfig.json but without test files, so vitest specs never land in dist/.",
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"]
+}
+```
