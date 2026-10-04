@@ -117,6 +117,12 @@ DISCORD_PUBLIC_KEY=<your app's public key>
 DISCORD_APPLICATION_ID=<your app's application id>
 DISCORD_BOT_TOKEN=<your bot token — never in client code>
 
+# Discord OAuth2 Authentication (Milestone 5)
+DISCORD_CLIENT_ID=<your app's application id>
+DISCORD_CLIENT_SECRET=<your app's OAuth2 client secret>
+DISCORD_REDIRECT_URI=https://<your-backend>.up.railway.app/api/auth/discord/callback
+SESSION_SECRET=<64 random hex chars for HMAC-SHA256 session token; falls back to ADMIN_API_KEY>
+
 # Generate a NEW random value — not "dev-admin-key":
 ADMIN_API_KEY=<64 random hex chars>
 #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -128,12 +134,18 @@ RATE_LIMIT_WINDOW_MS=60000
 RATE_LIMIT_MAX=120
 ```
 
-> **Do not set `VITE_ADMIN_API_KEY` on a public frontend.** Anything `VITE_`-prefixed is compiled
-> into the browser bundle. The current app has no user login/session authentication, while bot
-> sends, channel/message reads, and profile management require `x-admin-key`. Therefore those bot
-> workflows are not available from a public SPA with the key omitted. Use a private/trusted frontend
-> behind an access gate, or implement real authentication before exposing bot workflows publicly.
-> Webhook sends go directly from the browser to Discord and do not require this key.
+> ⚠️ **Discord Developer Portal Setup for OAuth2:**
+> 1. In <https://discord.com/developers/applications> → your app → **OAuth2**:
+> 2. Add your Redirect URI: `https://<your-backend>.up.railway.app/api/auth/discord/callback`.
+> 3. Save changes. Users can now log in securely via the "Login with Discord" blurple button in the header.
+
+> ℹ️ **File Attachments & Uploads:**
+> The server includes an in-memory multipart parser on `/api/send`. Uploaded files (up to 10 files, 25MB each) are forwarded straight to Discord's API as multipart attachments (`payload_json` + files) with zero permanent disk writes.
+
+> ⚠️ **Do not set `VITE_ADMIN_API_KEY` on the frontend in production.** Anything `VITE_`-prefixed
+> is compiled into the browser bundle — every visitor could read it and call `/api/send` in bot
+> mode. Locally it's a convenience; in production it's a hole. Production users authenticate
+> via Discord OAuth2 login or granular Staff Permissions.
 
 ### 3.3 Run migrations on the server
 
@@ -168,10 +180,10 @@ curl https://<your-backend>.up.railway.app/api/health
 
 ### 4.1 Sanity-check the pairing
 
-For webhook sends, open DevTools → Network and confirm the request goes directly to Discord. Bot
-mode requires a private/trusted frontend with `x-admin-key` supplied securely, or a real login flow;
-do not add the shared admin key to a public Pages build. If you see CORS errors, the `CLIENT_ORIGIN`
-on the backend doesn't match the frontend URL exactly (scheme + host, no trailing slash).
+From the deployed site, open DevTools → Network while sending in **bot mode** — the request
+should go to your Railway URL, and the backend log should show the request arriving. If you see
+CORS errors, the `CLIENT_ORIGIN` on the backend doesn't match the frontend URL exactly
+(scheme + host, no trailing slash).
 
 ---
 
@@ -220,17 +232,17 @@ leaving them with "This interaction failed".
 
 
 > **Multi-step flows and the database.** A `custom_id` can only carry ~100 characters, so the
-> editor sends each full chain with `POST /api/send`. After Discord returns the message ID, the API
-> stores those steps in `action_definitions` scoped to that message before it acknowledges the
-> send. The deployed backend's SQLite file must be on the persistent volume — otherwise these
-> message-specific flows vanish on the next deploy and buttons fall back to their inline action.
+> editor registers a component's full chain with `POST /api/send` just before the message goes
+> out. Those rows live in `action_definitions` (with a null `template_id`), which means the
+> deployed backend's SQLite file must be on the persistent volume — otherwise the flows vanish on
+> the next deploy and buttons fall back to only their first inline step.
 
 ---
 
 ## 6. Security checklist
 
 - [ ] `ADMIN_API_KEY` is a fresh random value (not `dev-admin-key`) and is shared only with people who may use bot-mode sending.
-- [ ] `VITE_ADMIN_API_KEY` is **not** set on a public frontend; bot send/profile routes need real authentication before public access.
+- [ ] `VITE_ADMIN_API_KEY` is **not** set on the frontend host (or you accept that anyone can read it — recommended: don't).
 - [ ] `DISCORD_BOT_TOKEN` exists **only** in backend env vars; never committed, never in client code.
 - [ ] `ENCRYPTION_KEY` generated, backed up somewhere safe; rotating it invalidates saved bot profiles.
 - [ ] `CLIENT_ORIGIN` lists your real frontend URL(s) — nothing else.
@@ -249,7 +261,7 @@ leaving them with "This interaction failed".
 | Buttons do nothing in production               | Endpoint URL still pointing at an old tunnel; or `DISCORD_PUBLIC_KEY` mismatch                   |
 | Buttons do nothing, and no request reaches the API at all | No public address *and* no gateway worker running. Clear the endpoint URL and start `dmb-gateway` (§5.1) |
 | Relay logs `Can't reach the API`                | `bot/.env` `API_BASE_URL`/`ADMIN_API_KEY` wrong, or `dmb-api` is not running                          |
-| A slow flow acknowledges but its final message is missing | Check API logs for followup delivery errors; delayed modals cannot open after deferral         |
+| Button says "This interaction failed" but the flow ran | A `wait` step pushed the reply past Discord's 3-second window                                  |
 | Only the first flow step runs                   | The message was sent before the flow was registered, or the DB was wiped — re-send in bot-token mode |
 | Database resets after every deploy             | SQLite file not on a persistent volume (`DATABASE_URL` pointing outside the mount)               |
 | Everything works then starts 429ing            | Rate limiter (`RATE_LIMIT_MAX` per `RATE_LIMIT_WINDOW_MS`); raise it or wait out the window      |

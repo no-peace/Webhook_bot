@@ -1,4 +1,5 @@
-Implementation Plan: Discohook Clone & Action System
+# Implementation Plan: Discohook Clone & Action System
+
 Goal Description
 The objective is to fix the current crash/stuck errors related to Components V2, redesign the frontend to perfectly match the aesthetic of discohook_src, add the highly requested "Action" tab to power multi-step conditional workflows, and finally update the documentation.
 

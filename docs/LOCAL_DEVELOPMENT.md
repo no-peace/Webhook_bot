@@ -89,6 +89,12 @@ DISCORD_PUBLIC_KEY=
 DISCORD_APPLICATION_ID=
 DISCORD_BOT_TOKEN=
 
+# Discord OAuth2 Login (Milestone 5)
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+DISCORD_REDIRECT_URI=http://localhost:3001/api/auth/discord/callback
+SESSION_SECRET=dev-session-secret
+
 ADMIN_API_KEY=dev-admin-key
 ENCRYPTION_KEY=
 ```
@@ -108,11 +114,21 @@ ENCRYPTION_KEY=
   [Step 6](#6-optional-test-button-clicks-interactions)). Sending messages via **webhook URL
   works with none of them filled in**, because the browser talks straight to Discord.
 
+- **Discord OAuth2 Login (Optional locally):**
+  If testing Discord login locally, configure your Discord Application:
+  1. Set `DISCORD_CLIENT_ID` to your Discord Application ID.
+  2. Set `DISCORD_CLIENT_SECRET` from Discord Developer Portal -> OAuth2.
+  3. In Developer Portal -> OAuth2 -> Redirects, add `http://localhost:3001/api/auth/discord/callback`.
+  4. For automated testing or quick local logins without real Discord credentials, `POST /api/auth/dev-login` can issue an active session cookie directly!
+
+- **File Attachments & Media Uploads:**
+  The Message Editor features a Discohook-style File Attachments section (supporting up to 10 files, 25MB each, spoiler badges, and preview thumbnails). All uploads are buffered in RAM and forwarded directly to Discord's API with zero disk storage.
+
 **`client/.env`** defaults are already correct for local development — no edits needed.
 
 > ⚠️ The `VITE_ADMIN_API_KEY` in `client/.env` is a **development convenience only**. Anything
-> starting with `VITE_` is bundled into the browser and visible to everyone. Real deployments
-> need proper auth before exposing the API.
+> starting with `VITE_` is bundled into the browser and visible to everyone. In production,
+> user authorization is secured via Discord OAuth2 session cookies (`dmb_session`) and granular Staff Permissions.
 
 ### 2.3 Create the database
 
@@ -157,11 +173,11 @@ tab picker is built from. (If you see fewer, the server build is stale: `npm run
 4. For Components V2, use the **component palette** to drag in containers, sections, buttons,
    etc. Discord's V2 components don't support the classic `content`/`embeds` fields together,
    so the preview switches to a V2-only layout automatically.
-5. Select a button or select menu and open its **Flow** tab. Add steps and order them with the
+5. Select a button or select menu and open its **Action** tab. Add steps and order them with the
    up/down arrows — for example *Add role* → *Send DM* → *Ephemeral reply*. Steps run top to
    bottom and stop at the first one that sends a visible reply.
 
-   The Flow tab mirrors Discohook's, so these are available:
+   The Action tab mirrors Discohook's, so these are available:
 
    | Step | What it does |
    | ---- | ------------ |
@@ -267,7 +283,7 @@ computer is behind your home router — needs a temporary public tunnel.
 > browser to Discord, so only that first inline step can run.
 
 > **Already wired up?** Buttons whose flow you have not touched default to `action:dud` (do
-> nothing) — pick a real action on the Flow tab before sending if you want a click to do
+> nothing) — pick a real action on the Action tab before sending if you want a click to do
 > something.
 
 > Tunnel URLs change every time you restart `cloudflared`, so re-save the endpoint URL after a

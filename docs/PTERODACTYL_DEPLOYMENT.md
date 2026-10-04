@@ -171,12 +171,22 @@ DATABASE_URL=/home/container/data/prod.sqlite
 DISCORD_BOT_TOKEN=<your bot token>
 DISCORD_APPLICATION_ID=<your app's application id>
 
+# Discord OAuth2 Configuration (Milestone 5)
+DISCORD_CLIENT_ID=<your app's application id>
+DISCORD_CLIENT_SECRET=<your OAuth2 client secret>
+DISCORD_REDIRECT_URI=https://<your-published-domain>/api/auth/discord/callback
+SESSION_SECRET=<64 random hex chars; HMAC-SHA256 session cookie signing key>
+
 # Only needed for HTTP webhook mode (§7). Harmless to leave it set.
 DISCORD_PUBLIC_KEY=<your app's public key>
 
 ADMIN_API_KEY=<64 random hex chars>
 ENCRYPTION_KEY=<64 random hex chars>
 ```
+
+> **Note on OAuth2 & File Attachments:**
+> - If you expose the web UI via a reverse proxy or Cloudflare tunnel, set `DISCORD_REDIRECT_URI` to your public URL's `/api/auth/discord/callback`.
+> - File attachments in messages are handled completely in memory and forwarded straight to Discord's API without writing temporary files to the container disk.
 
 And in `bot/.env` (copy from `bot/.env.example`):
 
@@ -276,7 +286,7 @@ a readable error instead of leaving them with "This interaction failed".
 | nothing at all in either log | Endpoint URL is still set, so Discord sent the interaction over HTTP instead |
 | `interaction relay failed: Can't reach the API…` | `dmb-api` is down, or `API_BASE_URL`/`ADMIN_API_KEY` is wrong |
 | `Relay could not deliver a reply for …` | The flow ran but Discord rejected the callback — usually the 3-second window expired (long `wait` steps) |
-| `Ignoring unrecognised custom_id from …` | The button's `custom_id` is not `action:…` — re-pick an action on the Flow tab |
+| `Ignoring unrecognised custom_id from …` | The button's `custom_id` is not `action:…` — re-pick an action on the Action tab |
 
 ### 6.4 What the relay does *not* do
 

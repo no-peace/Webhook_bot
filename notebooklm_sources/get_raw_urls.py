@@ -83,7 +83,17 @@ def main():
     parser.add_argument("--branch", default="main", help="Branch (default: main)")
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN"), help="GitHub token")
     parser.add_argument("--outdir", default="ai_sources", help="Output directory for .md files")
+    parser.add_argument(
+        "--project-name",
+        default=None,
+        help="Project name used as the .md filename prefix (default: GitHub repo name)",
+    )
     args = parser.parse_args()
+
+    # Use the repo name as the default project prefix.
+    # Example: no-peace/Hoho_manager -> Hoho_manager_root_config.md
+    # Use --project-name Hoho when you want -> Hoho_root_config.md
+    project_name = args.project_name or args.repo.rsplit("/", 1)[-1]
 
     print(f"Fetching file tree from {args.repo}...")
     all_paths = fetch_tree(args.repo, args.branch, args.token)
@@ -105,7 +115,9 @@ def main():
 
     # Download and write
     for group_name, paths in groups.items():
-        out_file = Path(args.outdir) / f"{group_name}.md"
+        # Prefix each group with the project name to avoid filename collisions
+        # when multiple repositories are stored in the same ai_sources folder.
+        out_file = Path(args.outdir) / f"{project_name}_{group_name}.md"
         print(f"\nBuilding {out_file.name} ({len(paths)} files)...")
         
         with open(out_file, "w", encoding="utf-8") as f:
