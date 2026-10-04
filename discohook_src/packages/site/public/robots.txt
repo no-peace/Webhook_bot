@@ -1,8 +1,0 @@
-User-agent: *
-Disallow: /build/
-Disallow: /fonts/
-Disallow: /me
-Disallow: /me/
-Disallow: /s/
-Disallow: /api/
-Disallow: /auth/

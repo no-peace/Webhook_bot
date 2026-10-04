@@ -1,0 +1,8 @@
+.gitignore
+
+.opencode/
+.agents/
+.freebuff/
+hoho_manager/
+discohook_src/
+notebooklm_sources/
