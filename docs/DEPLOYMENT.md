@@ -307,3 +307,7 @@ multiple server instances):
 3. Point `DATABASE_URL` at the Postgres connection string and redeploy.
 
 No client changes needed — the API contract stays identical.
+## New Features & Architecture (Update 2)
+- **File Attachments:** Files are streamed directly to Discord in-memory (no local disk storage). External URLs are supported; the server downloads them and forwards the streams directly to Discord.
+- **Bot Dispatch & Multi-Channel Editing:** The 'Dispatch via Bot' feature supports multi-channel batch edits. Users can select multiple target channels and supply a comma-separated list of Message IDs to edit them simultaneously.
+- **OAuth2 Admin Integration:** The app now requires the user to log in via Discord OAuth2 to list their servers. The VITE_ADMIN_API_KEY bypasses authentication checks in local dev.

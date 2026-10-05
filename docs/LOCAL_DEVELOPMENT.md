@@ -391,3 +391,7 @@ Both routes run the same flow code, so a button behaves identically either way.
 
 > **Note (Windows):** to stop a stuck Node process: `netstat -ano | findstr :3001` to find the
 > PID, then `taskkill /F /PID <pid>`. In Git Bash, use `taskkill //F //PID <pid>` (double slash).
+## New Features & Architecture (Update 2)
+- **File Attachments:** Files are streamed directly to Discord in-memory (no local disk storage). External URLs are supported; the server downloads them and forwards the streams directly to Discord.
+- **Bot Dispatch & Multi-Channel Editing:** The 'Dispatch via Bot' feature supports multi-channel batch edits. Users can select multiple target channels and supply a comma-separated list of Message IDs to edit them simultaneously.
+- **OAuth2 Admin Integration:** The app now requires the user to log in via Discord OAuth2 to list their servers. The VITE_ADMIN_API_KEY bypasses authentication checks in local dev.

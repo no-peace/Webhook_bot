@@ -191,4 +191,16 @@ a quick checklist for you or the next AI when you resume:
 - **Live Preview Integration (`MessagePreview.tsx` & `EmbedPreview.tsx`)**:
   - `EmbedPreview.tsx` resolves `attachment://filename.png` image and thumbnail URLs directly against in-memory attached files.
   - `MessagePreview.tsx` displays live attachment preview cards with interactive spoiler blur reveal.
-  - `isPayloadEmpty` permits messages containing file attachments even when text and embeds are omitted.
+  - `isPayloadEmpty` permits messages containing file attachments even when text and embeds are omitted.## New Features & Architecture (Update 2)
+- **File Attachments:** Files are streamed directly to Discord in-memory (no local disk storage). External URLs are supported; the server downloads them and forwards the streams directly to Discord.
+- **Bot Dispatch & Multi-Channel Editing:** The 'Dispatch via Bot' feature supports multi-channel batch edits. Users can select multiple target channels and supply a comma-separated list of Message IDs to edit them simultaneously.
+- **OAuth2 Admin Integration:** The app now requires the user to log in via Discord OAuth2 to list their servers. The VITE_ADMIN_API_KEY bypasses authentication checks in local dev.
+
+
+## Handoff: Discohook UI Clone Teamwork
+- **Date:** 2026-10-05
+- **Status:** Teamwork subagent ('teamwork_preview_swe') has been launched to complete the Discohook 1:1 UI Clone.
+- **Scope:** Includes Top Bar (Audit Logs, Sessions), Multi-Message architecture, Options dropdown (Flags, Allowed Mentions), Quick Mention Context Box, custom emoji saving, and Flow Triggers ('Member has role').
+- **Testing:** Strict automated API and UI testing requirements are enforced for the team.
+- **Next Steps:** Review the teamwork subagent's output, and run 
+pm install if they added dependencies. Wait for the Victory Audit to complete.

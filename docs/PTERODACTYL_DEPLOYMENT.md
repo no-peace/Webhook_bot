@@ -465,3 +465,7 @@ pm2 start ecosystem.config.cjs --only dmb-gateway
 | Button click says "This interaction failed" but the flow ran | A `wait` step pushed the reply past Discord's 3-second window — keep waits short or defer before waiting |
 | Only the first flow step runs | The message was sent before the flow was registered — re-send in **bot token** mode or from a template |
 | PM2 processes gone after a panel restart | `pm2 save` not run, or no `pm2 startup`/startup-command equivalent |
+## New Features & Architecture (Update 2)
+- **File Attachments:** Files are streamed directly to Discord in-memory (no local disk storage). External URLs are supported; the server downloads them and forwards the streams directly to Discord.
+- **Bot Dispatch & Multi-Channel Editing:** The 'Dispatch via Bot' feature supports multi-channel batch edits. Users can select multiple target channels and supply a comma-separated list of Message IDs to edit them simultaneously.
+- **OAuth2 Admin Integration:** The app now requires the user to log in via Discord OAuth2 to list their servers. The VITE_ADMIN_API_KEY bypasses authentication checks in local dev.
